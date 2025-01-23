@@ -22,20 +22,20 @@
 			font-size: 1rem;
 			cursor: pointer;
 		}
-		.metadata, .preview {
+		.metadata, .preview, .media-preview {
 			margin-top: 1rem;
 			padding: 1rem;
 			border: 1px solid #ccc;
 			border-radius: 5px;
 			background-color: #f9f9f9;
 		}
-		.metadata h2, .preview h2 {
+		.metadata h2, .preview h2, .media-preview h2 {
 			margin-top: 0;
 		}
-		.metadata p, .preview p {
+		.metadata p, .preview p, .media-preview p {
 			margin: 0.5rem 0;
 		}
-		.preview img {
+		.media-preview img, .preview img {
 			max-width: 100%;
 			height: auto;
 			margin-top: 1rem;
@@ -46,6 +46,33 @@
 			height: 338px; /* 16:9 aspect ratio */
 			margin-top: 1rem;
 			border: none;
+		}
+		.link-preview {
+			display: flex;
+			gap: 1rem;
+			align-items: flex-start;
+			border: 1px solid #ddd;
+			padding: 1rem;
+			border-radius: 5px;
+			background-color: #fff;
+		}
+		.link-preview img {
+			width: 120px;
+			height: auto;
+			border-radius: 5px;
+			object-fit: cover;
+		}
+		.link-preview .details {
+			flex: 1;
+		}
+		.link-preview .details h2 {
+			font-size: 1.2rem;
+			margin: 0;
+		}
+		.link-preview .details p {
+			font-size: 0.9rem;
+			color: #555;
+			margin: 0.5rem 0;
 		}
 	</style>
 </head>
@@ -89,7 +116,7 @@
 				$metadata = [];
 				$metaTags = $doc->getElementsByTagName('meta');
 
-				$ogImage = $ogVideo = $twitterPlayer = null;
+				$ogImage = $ogVideo = $twitterPlayer = $ogTitle = $ogDescription = null;
 
 				foreach ($metaTags as $tag) {
 					$property = $tag->getAttribute('property') ?: $tag->getAttribute('name');
@@ -97,7 +124,7 @@
 					if ($property && $content) {
 						$metadata[$property] = $content;
 
-						// Capture specific media previews
+						// Capture specific OpenGraph and Twitter card data
 						if ($property === 'og:image') {
 							$ogImage = $content;
 						}
@@ -107,11 +134,19 @@
 						if ($property === 'twitter:player') {
 							$twitterPlayer = $content;
 						}
+						if ($property === 'og:title') {
+							$ogTitle = $content;
+						}
+						if ($property === 'og:description') {
+							$ogDescription = $content;
+						}
 					}
 				}
 
 				// Display the metadata
 				echo '<div class="metadata">';
+				echo '<details>';
+				echo '<summary>All the Matadata</summary>';
 				echo '<h2>Metadata for: <a href="' . htmlspecialchars($url) . '" target="_blank">'. htmlspecialchars($url) .'</a></h2>';
 				if (!empty($metadata)) {
 					foreach ($metadata as $key => $value) {
@@ -120,30 +155,47 @@
 				} else {
 					echo '<p>No metadata found!</p>';
 				}
+				echo '</details>';
 				echo '</div>';
 
-				// Display media preview
-				echo '<div class="preview">';
-				echo '<h2>Media Preview</h2>';
-
-				if ($ogImage) {
-					echo '<p><strong>Image:</strong></p>';
-					echo '<img src="' . htmlspecialchars($ogImage) . '" alt="Open Graph Image Preview">';
+				// Display a media preview
+				if ($ogVideo || $twitterPlayer) {
+					echo '<div class="media-preview">';
+					echo '<details>';
+					echo '<summary>Image/Video</summary>';
+					echo '<h2>Media Preview</h2>';
+					if ($ogImage) {
+						echo '<p><strong>Image:</strong></p>';
+						echo '<img src="' . htmlspecialchars($ogImage) . '" alt="Open Graph Image Preview">';
+					}
+					if ($ogVideo) {
+						echo '<p><strong>Video:</strong></p>';
+						echo '<video controls src="' . htmlspecialchars($ogVideo) . '"></video>';
+					} elseif ($twitterPlayer) {
+						echo '<p><strong>Twitter Player:</strong></p>';
+						echo '<iframe src="' . htmlspecialchars($twitterPlayer) . '"></iframe>';
+					}
+					echo '</details>';
+					echo '</div>';
 				}
 
-				if ($ogVideo) {
-					echo '<p><strong>Video:</strong></p>';
-					echo '<video controls src="' . htmlspecialchars($ogVideo) . '"></video>';
-				} elseif ($twitterPlayer) {
-					echo '<p><strong>Twitter Player:</strong></p>';
-					echo '<iframe src="' . htmlspecialchars($twitterPlayer) . '" allowfullscreen></iframe>';
+				// Build and display a link preview
+				if ($ogTitle || $ogDescription || $ogImage) {
+					echo '<div class="preview link-preview">';
+					if ($ogImage) {
+						echo '<img src="' . htmlspecialchars($ogImage) . '" alt="Preview Image">';
+					}
+					echo '<div class="details">';
+					if ($ogTitle) {
+						echo '<h2>' . htmlspecialchars($ogTitle) . '</h2>';
+					}
+					if ($ogDescription) {
+						echo '<p>' . htmlspecialchars($ogDescription) . '</p>';
+					}
+					echo '<p><a href="' . htmlspecialchars($url) . '" target="_blank">Visit Link</a></p>';
+					echo '</div>';
+					echo '</div>';
 				}
-
-				if (!$ogImage && !$ogVideo && !$twitterPlayer) {
-					echo '<p>No media preview available for this URL.</p>';
-				}
-
-				echo '</div>';
 			} else {
 				echo '<p style="color: red;">Unable to fetch the URL. Please check the URL and try again.</p>';
 			}
