@@ -29,7 +29,7 @@
 			border-radius: 5px;
 			background-color: #f9f9f9;
 		}
-		.metadata h3, .preview h3 {
+		.metadata h2, .preview h2 {
 			margin-top: 0;
 		}
 		.metadata p, .preview p {
@@ -112,7 +112,7 @@
 
 				// Display the metadata
 				echo '<div class="metadata">';
-				echo '<h3>Metadata for: ' . htmlspecialchars($url) . '</h3>';
+				echo '<h2>Metadata for: <a href="' . htmlspecialchars($url) . '" target="_blank">'. htmlspecialchars($url) .'</a></h2>';
 				if (!empty($metadata)) {
 					foreach ($metadata as $key => $value) {
 						echo '<p><strong>' . htmlspecialchars($key) . ':</strong> ' . htmlspecialchars($value) . '</p>';
@@ -124,7 +124,7 @@
 
 				// Display media preview
 				echo '<div class="preview">';
-				echo '<h3>Media Preview</h3>';
+				echo '<h2>Media Preview</h2>';
 
 				if ($ogImage) {
 					echo '<p><strong>Image:</strong></p>';
