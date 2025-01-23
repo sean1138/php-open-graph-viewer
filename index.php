@@ -10,14 +10,21 @@
 			margin: 2rem;
 		}
 		form {
+			display: flex;
+			flex-wrap: wrap;
 			margin-bottom: 1rem;
 		}
+		[for="url"]{
+			width: 100%;
+		}
 		input[type="url"] {
-			width: 80%;
+/*			width: 80%;*/
+			flex-grow: 1;
 			padding: 0.5rem;
 			font-size: 1rem;
 		}
 		button {
+			margin-left: 1rem;
 			padding: 0.5rem 1rem;
 			font-size: 1rem;
 			cursor: pointer;
@@ -162,7 +169,7 @@
 				if ($ogVideo || $twitterPlayer) {
 					echo '<div class="media-preview">';
 					echo '<details>';
-					echo '<summary>Image/Video</summary>';
+					echo '<summary>Image/Video Embed</summary>';
 					echo '<h2>Media Preview</h2>';
 					if ($ogImage) {
 						echo '<p><strong>Image:</strong></p>';
